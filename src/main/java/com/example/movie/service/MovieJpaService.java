@@ -1,65 +1,73 @@
-package com.example.movie.service;
+package com.example.todo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.ArrayList;
-import java.util.List;
-import com.example.movie.model.Movie;
-import com.example.movie.repository.MovieJpaRepository;
-import com.example.movie.repository.MovieRepository;
+
+import java.util.*;
+
+import com.example.todo.model.Todo;
+import com.example.todo.repository.TodoJpaRepository;
+import com.example.todo.repository.TodoRepository;
 
 @Service
-public class MovieJpaService implements MovieRepository {
+public class TodoJpaService implements TodoRepository {
 
     @Autowired
-    private MovieJpaRepository movieJpaRepository;
+    private TodoJpaRepository todoJpaRepository;
 
     @Override
-    public ArrayList<Movie> getMovies() {
-        List<Movie> movieList = movieJpaRepository.findAll();
-        ArrayList<Movie> movies = new ArrayList<>(movieList);
-        return movies;
+    public ArrayList<Todo> getTodos() {
+        List<Todo> todoList = todoJpaRepository.findAll();
+        ArrayList<Todo> todos = new ArrayList<>(todoList);
+        return todos;
     }
 
     @Override
-    public Movie getMovieById(int movieId) {
+    public Todo getTodoById(int id) {
         try {
-            Movie movie = movieJpaRepository.findById(movieId).get();
-            return movie;
+            Todo todo = todoJpaRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            return todo;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
     @Override
-    public Movie addMovie(Movie movie) {
-        movieJpaRepository.save(movie);
-        return movie;
+    public Todo addTodo(Todo todo) {
+        todoJpaRepository.save(todo);
+        return todo;
     }
 
     @Override
-    public Movie updateMovie(int movieId, Movie movie) {
+    public Todo updateTodo(int id, Todo todo) {
         try {
-            Movie newMovie = movieJpaRepository.findById(movieId).get();
-            if (movie.getMovieName() != null) {
-                newMovie.setMovieName(movie.getMovieName());
+            Todo newTodo = todoJpaRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+            if (todo.getTodo() != null) {
+               newTodo.setTodo(todo.getTodo());
             }
-            if (movie.getLeadActor() != null) {
-                newMovie.setLeadActor(movie.getLeadActor());
+            if (todo.getStatus() != null) {
+                newTodo.setStatus(todo.getStatus());
             }
-            movieJpaRepository.save(newMovie);
-            return newMovie;
+            if (todo.getPriority() != null) {
+                newTodo.setPriority(todo.getPriority());
+            }
+
+            todoJpaRepository.save(newTodo);
+            return newTodo;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
     @Override
-    public void deleteMovie(int movieId) {
+    public void deleteTodo(int id) {
         try {
-            movieJpaRepository.deleteById(movieId);
+            todoJpaRepository.deleteById(id);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
